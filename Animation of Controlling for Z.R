@@ -10,8 +10,16 @@ df <- data.frame(W = as.integer((1:200>100))) %>%
   ungroup()
 
 #Calculate correlations
-before_cor <- paste("1. Start with raw data. Correlation between X and Y: ",round(cor(df$X,df$Y),3),sep='')
-after_cor <- paste("6. Analyze what's left! Correlation between X and Y controlling for W: ",round(cor(df$X-df$mean_X,df$Y-df$mean_Y),3),sep='')
+before_cor <- paste(
+  "1. Start with raw data. Correlation between X and Y: ",
+  round(cor(df$X,df$Y),3),
+  sep=''
+)
+after_cor <- paste(
+  "6. Analyze what's left! Correlation between X and Y controlling for W: ",
+  round(cor(df$X-df$mean_X,df$Y-df$mean_Y),3),
+  sep=''
+)
 
 
 
@@ -19,17 +27,23 @@ after_cor <- paste("6. Analyze what's left! Correlation between X and Y controll
 #Add step 2 in which X is demeaned, and 3 in which both X and Y are, and 4 which just changes label
 dffull <- rbind(
   #Step 1: Raw data only
-  df %>% mutate(mean_X=NA,mean_Y=NA,time=before_cor),
+  df %>% mutate(mean_X=NA,mean_Y=NA,
+                time=before_cor),
   #Step 2: Add x-lines
-  df %>% mutate(mean_Y=NA,time='2. Figure out what differences in X are explained by W'),
+  df %>% mutate(mean_Y=NA,
+                time='2. Figure out what differences in X are explained by W'),
   #Step 3: X de-meaned 
-  df %>% mutate(X = X - mean_X,mean_X=0,mean_Y=NA,time="3. Remove differences in X explained by W"),
+  df %>% mutate(X = X - mean_X,mean_X=0,mean_Y=NA,
+                time="3. Remove differences in X explained by W"),
   #Step 4: Remove X lines, add Y
-  df %>% mutate(X = X - mean_X,mean_X=NA,time="4. Figure out what differences in Y are explained by W"),
+  df %>% mutate(X = X - mean_X,mean_X=NA,
+                time="4. Figure out what differences in Y are explained by W"),
   #Step 5: Y de-meaned
-  df %>% mutate(X = X - mean_X,Y = Y - mean_Y,mean_X=NA,mean_Y=0,time="5. Remove differences in Y explained by W"),
+  df %>% mutate(X = X - mean_X,Y = Y - mean_Y,mean_X=NA,mean_Y=0,
+                time="5. Remove differences in Y explained by W"),
   #Step 6: Raw demeaned data only
-  df %>% mutate(X = X - mean_X,Y = Y - mean_Y,mean_X=NA,mean_Y=NA,time=after_cor))
+  df %>% mutate(X = X - mean_X,Y = Y - mean_Y,mean_X=NA,mean_Y=NA,
+                time=after_cor))
 
 p <- ggplot(dffull,aes(y=Y,x=X,color=as.factor(W)))+geom_point()+
   geom_vline(aes(xintercept=mean_X,color=as.factor(W)))+
@@ -37,7 +51,12 @@ p <- ggplot(dffull,aes(y=Y,x=X,color=as.factor(W)))+geom_point()+
   guides(color=guide_legend(title="W"))+
   scale_color_colorblind()+
   labs(title = 'The Relationship between Y and X, Controlling for a Binary Variable W \n{next_state}')+
-  transition_states(time,transition_length=c(12,32,12,32,12,12),state_length=c(160,100,75,100,75,160),wrap=FALSE)+
+  transition_states(
+    time,
+    transition_length=c(12,32,12,32,12,12),
+    state_length=c(160,100,75,100,75,160),
+    wrap=FALSE
+  )+
   ease_aes('sine-in-out')+
   exit_fade()+enter_fade()
 
